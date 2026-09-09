@@ -1,0 +1,44 @@
+name: Phase 0A v1.1 Frozen QUAL
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: coreno-self-phase0a-v1.1-frozen-qual
+  cancel-in-progress: false
+
+jobs:
+  frozen-qual:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+      - name: Install dependencies
+        run: python -m pip install --upgrade pip && pip install -r requirements.txt
+      - name: Record source hash
+        run: sha256sum phase0a/src/coreno_self_phase0a_v1_1.py | tee SOURCE_SHA256.txt
+      - name: Run frozen 64-seed qualification
+        run: python phase0a/src/coreno_self_phase0a_v1_1.py --out results/coreno_self_phase0a_v1_1
+      - name: Print frozen decision
+        if: always()
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          p = Path("results/coreno_self_phase0a_v1_1/decision.json")
+          if not p.exists():
+              raise SystemExit("decision.json missing")
+          d = json.loads(p.read_text())
+          print(json.dumps(d, indent=2, ensure_ascii=False))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: phase0a-v1.1-frozen-qual
+          path: |
+            results/coreno_self_phase0a_v1_1
+            SOURCE_SHA256.txt
