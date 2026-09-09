@@ -1,0 +1,127 @@
+{
+  "prompt_name": "CORENO_Self_Phase0A_v1.1_Minimal_Synthetic_Qualification_Work_Prompt",
+  "version": "1.1",
+  "target_system": "ChatGPT Work",
+  "language": "ja",
+  "research_program": "CORENO Self",
+  "phase": "Phase 0A v1.1 — Minimal Synthetic Qualification",
+  "execution_mode": "FALSIFICATION_FIRST_SYNTHETIC_QUALIFICATION",
+  "primary_source": "CORENO_Self_Boundary_Update_Theory.pdf",
+  "mission": {
+    "primary_objective": "元論文のG — INSUFFICIENT_EVIDENCE判定から直接つながる最小合成QUALを行う。ただしM3のoracle U優位を構造的証拠と解釈せず、情報集合効果・構造成分・因果履歴・アクセス相対性・同一性操作化を分離して監査する。",
+    "secondary_objectives": [
+      "原論文のM0/M1/M2/M3は情報集合ラダーとしてのみ報告する。",
+      "境界・履歴・アクセスの必要性は、oracle Uを含む同一情報条件のもとで縮小モデルを毎回ゼロから再学習して比較する。",
+      "STATE_SUFFICIENT負対照は『勝たなかった』ではなく、事前固定した実用同等幅±2%の中にseed単位bootstrap 95%CI全体が入ることを要求する。",
+      "履歴因果監査は、予測器入力のシャッフルではなく、同一イベント集合の順序を介入で変更し、その後に履歴担体Hを再生成して下流応答を比較する。",
+      "アクセス監査はラベルだけを交換せず、同一潜在状態からアクセスごとの観測作用素・境界・予測対象を一貫して再生成したcoherent access twinsを用いる。",
+      "自己同一性監査はd_FだけでなくC(Gamma1,Gamma2)>tau_Cを実装し、同一更新則を持つ独立cloneを同一人物と誤判定しないことを確認する。",
+      "境界FAILをPRACTICAL_EQUIVALENCEとINCONCLUSIVEに分離し、同等性確認時のみ縮小理論へ移行する。"
+    ],
+    "not_objectives": [
+      "人間の自己・意識・クオリア・魂・死後継続の実証",
+      "固定核不存在の自然科学的証明",
+      "oracle Uを現実の潜在意識測定とみなすこと",
+      "d_F単独を自己同一性証明とみなすこと",
+      "合成系PASSを存在論的真理へ外挿すること"
+    ]
+  },
+  "claim_firewall": {
+    "authorized_claim_if_pass": "凍結された合成生成器内部で、境界・履歴・アクセスの各成分が再学習アブレーションと因果介入により数値的に識別され、STATE_SUFFICIENT負対照とd_F+C同一性監査も凍結条件下で通過した、とだけ言える。",
+    "prohibited_claims": [
+      "CORENO式自己が人間の自己を説明した",
+      "固定核が存在しないことを証明した",
+      "潜在意識の実体を発見または測定した",
+      "自己同一性が更新則であることを自然界で実証した",
+      "境界成分がINCONCLUSIVEなのに不要と断定した"
+    ]
+  },
+  "frozen_spec": {
+    "n_seeds": 64,
+    "seed_namespaces": {
+      "FULL": "11000..11063",
+      "STATE_SUFFICIENT": "21000..21063",
+      "HISTORY_CAUSAL": "31000..31063",
+      "bootstrap": 90210
+    },
+    "n_trajectories_per_seed": 48,
+    "steps_per_trajectory": 64,
+    "train_fraction_by_trajectory": 0.7,
+    "estimator": "StandardScaler + Ridge(alpha=1.0)",
+    "bootstrap": "20,000 replicates at SEED level; paired structure preserved",
+    "information_ladder": {
+      "M0": "S",
+      "M1": "S+H",
+      "M2": "B+H",
+      "M3": "B+H+oracle U+a",
+      "interpretation": "diagnostic only; M3 advantage is not architecture evidence because U is oracle"
+    },
+    "matched_retrained_component_models": {
+      "FULL": "S+B+H+oracle U+a",
+      "NO_B": "S+H+oracle U+a",
+      "NO_H": "S+B+oracle U+a",
+      "NO_A": "S+B+H+oracle U",
+      "NO_U": "S+B+H+a (diagnostic only)"
+    },
+    "component_support_rule": "relative degradation=(L_reduced-L_full)/L_full; SUPPORTED if bootstrap 95% lower bound > +0.05",
+    "component_equivalence_rule": "PRACTICALLY_EQUIVALENT if bootstrap 95%CI entirely within [-0.02,+0.02]",
+    "component_inconclusive_rule": "otherwise INCONCLUSIVE; do not reduce theory",
+    "state_sufficient_negative_control": "relative MSE difference of FULL_EXTRA vs BASE_S must have bootstrap 95%CI entirely within [-0.02,+0.02]",
+    "history_causal_rule": "same event multiset, order changed BEFORE H regeneration; paired downstream |DeltaY| bootstrap 95% lower bound > 0.05",
+    "history_erasure_control": "with regenerated carriers erased to H=0 in both arms, 95% upper bound of |DeltaY| < 0.01",
+    "access_rule": "coherent access twins: observation operator, B, and Y are recomputed together; no label-only swap",
+    "identity": {
+      "F_output_scale": "tanh output fixed to [-1,1]",
+      "dF_short": "one-step RMSE on frozen intervention probes; epsilon=0.10",
+      "dF_long": "32-step rollout RMSE on frozen intervention sequences; epsilon=0.15",
+      "C": "known-lineage continuity score including causal lineage + handoff state/history/boundary continuity + viability",
+      "tau_C": 0.8,
+      "negative_identity_control": "independent same-rule clone must have C<tau_C even if handoff values are matched"
+    }
+  },
+  "decision_logic": {
+    "SYNTHETIC_QUAL_PASS": "B/H/A components all SUPPORTED, STATE_SUFFICIENT equivalence PASS, history-order causal PASS, carrier-erasure PASS, d_F+C identity audit PASS",
+    "COMPONENT_EQUIVALENCE_REDUCE_THEORY": "at least one component is PRACTICALLY_EQUIVALENT; reduction allowed only for that component",
+    "INCONCLUSIVE_COMPONENT_NECESSITY": "component CI is neither support nor equivalence; precision insufficient; do not shrink theory",
+    "QUAL_FAIL": "negative control, history causal control, or identity operationalization fails without an equivalence-based reduction path"
+  },
+  "work_instructions": [
+    "最初に元論文のResearch Audit、Claim Firewall、Sections 7-11、Limitations、Reviewer Simulationを読む。",
+    "coreno_self_phase0a_v1_1.pyのSHA256を記録し、凍結実行前にコード・設定・閾値を変更しない。",
+    "まず--quickで技術スモークテストを行うが、その出力をQUAL判定に使わない。",
+    "本実行は--quickなし、64 seedsで行う。",
+    "seed内の軌道・時点を独立標本としてbootstrapしない。必ずseed単位の対応bootstrapを保持する。",
+    "M3情報ラダーQは参考値としてのみ報告し、構造的優位の根拠に使わない。",
+    "境界・履歴・アクセスは縮小モデルを再学習して比較する。学習済みFULL入力をゼロ化するだけのアブレーションは禁止する。",
+    "履歴因果監査ではイベント順序を変更後にHを再生成する。予測器入力だけのshuffleを因果証拠と呼ばない。",
+    "アクセス監査でアクセスラベルだけを交換しない。coherent access twinsを使用する。",
+    "境界がSUPPORTEDでなければ、PRACTICALLY_EQUIVALENTかINCONCLUSIVEかを明示する。INCONCLUSIVEから自動縮小しない。",
+    "identity auditはd_F short/longとC,tau_Cを両方報告する。d_Fだけで自己同一性を主張しない。",
+    "バグ修正以外のpost-hoc閾値変更は禁止。バグ修正時は前後SHA256と変更理由をaudit_logに残す。"
+  ],
+  "required_outputs": [
+    "config_frozen.json",
+    "seed_results_full.csv",
+    "seed_results_state_sufficient.csv",
+    "history_order_causal_audit.csv",
+    "summary.json",
+    "decision.json",
+    "manifest.json",
+    "audit_log.md",
+    "component_retrained_audit.png",
+    "state_sufficient_equivalence.png"
+  ],
+  "final_report_format": {
+    "CURRENT_GATE": "PHASE_0A_V1_1_SYNTHETIC_QUAL",
+    "SPEC_HASH": "sha256",
+    "INFORMATION_LADDER": "M0-M3 losses and Q; explicitly non-gating",
+    "MATCHED_COMPONENTS": "B/H/A relative degradation + 95%CI + SUPPORTED/EQUIVALENT/INCONCLUSIVE",
+    "STATE_SUFFICIENT": "relative difference + 95%CI + equivalence margin",
+    "HISTORY_CAUSAL": "order intervention effect + erased-carrier control",
+    "ACCESS_AUDIT": "confirm coherent twin implementation; no label-only swap",
+    "IDENTITY_AUDIT": "d_F short/long, output scale, C lineage, C clone, tau_C",
+    "FINAL_DECISION": "one of four frozen labels",
+    "CLAIM_FIREWALL": "authorized and prohibited claims",
+    "NEXT_AUTHORIZED_STEP": "one narrow next step"
+  }
+}

@@ -1,0 +1,69 @@
+name: Phase 0A v1.1 Smoke
+
+on:
+  pull_request:
+    paths:
+      - "phase0a/**"
+      - "requirements*.txt"
+      - ".github/workflows/phase0a-smoke.yml"
+  push:
+    branches: [main]
+    paths:
+      - "phase0a/**"
+      - "requirements*.txt"
+  workflow_dispatch:
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+          cache-dependency-path: requirements-ci.txt
+      - name: Install frozen dependencies
+        run: python -m pip install --upgrade pip && pip install -r requirements-ci.txt
+      - name: Record environment and source hash
+        run: |
+          python --version | tee ENVIRONMENT.txt
+          pip freeze | tee -a ENVIRONMENT.txt
+          sha256sum phase0a/src/coreno_self_phase0a_v1_1.py | tee SOURCE_SHA256.txt
+      - name: Syntax check
+        run: python -m py_compile phase0a/src/coreno_self_phase0a_v1_1.py
+      - name: Frozen contract tests
+        run: python -m unittest discover -s phase0a/tests -p "test_*.py" -v
+      - name: Technical smoke test
+        run: python phase0a/src/coreno_self_phase0a_v1_1.py --out results/smoke_v1_1 --quick
+      - name: Verify expected artifacts
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          required = {
+              "config_frozen.json",
+              "seed_results_full.csv",
+              "seed_results_state_sufficient.csv",
+              "history_order_causal_audit.csv",
+              "summary.json",
+              "decision.json",
+              "manifest.json",
+              "audit_log.md",
+              "component_retrained_audit.png",
+              "state_sufficient_equivalence.png",
+          }
+          out = Path("results/smoke_v1_1")
+          missing = sorted(required - {p.name for p in out.iterdir() if p.is_file()})
+          if missing:
+              raise SystemExit(f"missing artifacts: {missing}")
+          print("technical artifact check: PASS")
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: phase0a-v1.1-smoke
+          path: |
+            results/smoke_v1_1
+            SOURCE_SHA256.txt
+            ENVIRONMENT.txt
