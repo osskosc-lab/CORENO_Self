@@ -1,0 +1,1 @@
+"""CORENO Self research package."""
