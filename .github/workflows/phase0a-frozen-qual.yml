@@ -17,10 +17,14 @@ jobs:
         with:
           python-version: "3.11"
           cache: "pip"
-      - name: Install dependencies
-        run: python -m pip install --upgrade pip && pip install -r requirements.txt
-      - name: Record source hash
-        run: sha256sum phase0a/src/coreno_self_phase0a_v1_1.py | tee SOURCE_SHA256.txt
+          cache-dependency-path: requirements-ci.txt
+      - name: Install frozen dependencies
+        run: python -m pip install --upgrade pip && pip install -r requirements-ci.txt
+      - name: Record environment and source hash
+        run: |
+          python --version | tee ENVIRONMENT.txt
+          pip freeze | tee -a ENVIRONMENT.txt
+          sha256sum phase0a/src/coreno_self_phase0a_v1_1.py | tee SOURCE_SHA256.txt
       - name: Run frozen 64-seed qualification
         run: python phase0a/src/coreno_self_phase0a_v1_1.py --out results/coreno_self_phase0a_v1_1
       - name: Print frozen decision
@@ -42,3 +46,4 @@ jobs:
           path: |
             results/coreno_self_phase0a_v1_1
             SOURCE_SHA256.txt
+            ENVIRONMENT.txt
